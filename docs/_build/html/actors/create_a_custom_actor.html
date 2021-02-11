@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Create a Custom Actor &#8212; tapis-cli-actors  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="create-a-custom-actor">
+<h1>Create a Custom Actor<a class="headerlink" href="#create-a-custom-actor" title="Permalink to this headline">¶</a></h1>
+<p>This guide will demonstrate how to create a custom actor from scratch. It is
+assumed you are already familiar with how to
+<a class="reference external" href="work_with_actors.html">Work with Actors</a>.
+In this example, we will build a simple word count actor that counts and prints
+the number of words in a provided message.</p>
+<div class="section" id="components-of-an-actor">
+<h2>Components of an Actor<a class="headerlink" href="#components-of-an-actor" title="Permalink to this headline">¶</a></h2>
+<p>Make a new directory and add the following files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ mkdir word-count-actor/ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> word-count-actor/
+
+$ touch Dockerfile word_count.py environment.json
+
+$ tree ../word-count-actor/
+word-count-actor/
+├── Dockerfile
+├── environment.json
+└── word_count.py
+
+<span class="m">0</span> directories, <span class="m">3</span> files
+</pre></div>
+</div>
+</div>
+<div class="section" id="write-the-actor-function">
+<h2>Write the Actor Function<a class="headerlink" href="#write-the-actor-function" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">word_count.py</span></code> python script is where the code for your main function can
+be found. An example of a functional actor that performs a word count is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">agavepy.actors</span> <span class="kn">import</span> <span class="n">get_context</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">()</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;raw_message&#39;</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">word_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The number of words is: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">word_count</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;An unexpected error has occurred: &#39;</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This code makes use of the <strong>agavepy</strong> python library which we will install in
+the Docker container. The library includes an “actors” object which is useful to
+grab the message and other context from the environment. And, it can be used to
+interact with other parts of the Tapis platform. Add the above code to your
+<code class="docutils literal notranslate"><span class="pre">word_count.py</span></code> file.</p>
+</div>
+<div class="section" id="define-environment-variables">
+<h2>Define Environment Variables<a class="headerlink" href="#define-environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">environment.json</span></code> file may contain useful environment variables or
+configurations to pass to the actor at creation time. These variables will be
+part of the “context” taken from the environment, as in the example python
+script above. For the purposes of this example, add the following definition to
+<code class="docutils literal notranslate"><span class="pre">environment.json</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-dockerfile">
+<h2>Create a Dockerfile<a class="headerlink" href="#create-a-dockerfile" title="Permalink to this headline">¶</a></h2>
+<p>The only requirements are python and the agavepy python library, which is
+available through
+<a class="reference external" href="https://pypi.org/">PyPi</a>.
+A bare-bones Dockerfile needs to satisfy those dependencies, add the actor
+python script, and set a default command to run the actor python script. Add
+the following lines to your <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>FROM python:3.7-slim
+
+RUN pip install --no-cache-dir <span class="nv">agavepy</span><span class="o">==</span><span class="m">0</span>.9.3
+
+ADD word_count.py /word_count.py
+
+RUN chmod +x /word_count.py
+
+CMD <span class="o">[</span><span class="s2">&quot;python3&quot;</span>, <span class="s2">&quot;/word_count.py&quot;</span><span class="o">]</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Creating small Docker images is important for maintaining actor speed and
+efficiency</p>
+</div>
+</div>
+<div class="section" id="build-and-push-the-dockerfile">
+<h2>Build and Push the Dockerfile<a class="headerlink" href="#build-and-push-the-dockerfile" title="Permalink to this headline">¶</a></h2>
+<p>The Docker image must be pushed to a public repository in order for the actor
+to use it. Use the following Docker commands in your local actor folder to build
+and push to a repository that you have access to:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build and tag the image</span>
+$ docker build -t taccuser/word-count:1.0 .
+Sending build context to Docker daemon  <span class="m">4</span>.096kB
+Step <span class="m">1</span>/5 : FROM python:3.7-slim
+...
+Successfully built b0a76425e8b3
+Successfully tagged taccuser/word-count:1.0
+
+<span class="c1"># Push the tagged image to Docker Hub</span>
+$ docker push taccuser/word-count:1.0
+The push refers to repository <span class="o">[</span>docker.io/taccuser/word-count<span class="o">]</span>
+...
+<span class="m">1</span>.0: digest: sha256:67cc6f6f00589d9ae83b99d779e4893a25e103d07e4f660c14d9a0ee06a9ddaf size: <span class="m">1995</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-the-actor">
+<h2>Create the Actor<a class="headerlink" href="#create-the-actor" title="Permalink to this headline">¶</a></h2>
+<p>Next, create an actor referring to the Docker repository above. Also, pass the
+JSON file containing environment variables:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors create --repo taccuser/word-count:1.0 <span class="se">\</span>
+                      -n word-count <span class="se">\</span>
+                      -d <span class="s2">&quot;Count the number of words in the message&quot;</span> <span class="se">\</span>
+                      -E environment.json
++----------------+----------------------------+
+<span class="p">|</span> Field          <span class="p">|</span> Value                      <span class="p">|</span>
++----------------+----------------------------+
+<span class="p">|</span> id             <span class="p">|</span> KKP0jKRGJ5l5K              <span class="p">|</span>
+<span class="p">|</span> name           <span class="p">|</span> word-count                 <span class="p">|</span>
+<span class="p">|</span> owner          <span class="p">|</span> taccuser                   <span class="p">|</span>
+<span class="p">|</span> image          <span class="p">|</span> taccuser/word-count:1.0    <span class="p">|</span>
+<span class="p">|</span> lastUpdateTime <span class="p">|</span> <span class="m">2020</span>-05-15 <span class="m">18</span>:00:33.685417 <span class="p">|</span>
+<span class="p">|</span> status         <span class="p">|</span> SUBMITTED                  <span class="p">|</span>
++----------------+----------------------------+
+</pre></div>
+</div>
+<p>After a few seconds, the actor should be in state “READY”, meaning it is ready
+to accept and process messages. Verbosely show the actor metadata to see that
+it’s status is “READY”, it is pointing to the correct docker image, and that it
+received the environment variables from <code class="docutils literal notranslate"><span class="pre">environment.json</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors show -v KKP0jKRGJ5l5K
+<span class="o">{</span>
+  <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;KKP0jKRGJ5l5K&quot;</span>,
+  <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;word-count&quot;</span>,
+  <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Count the number of words in the message&quot;</span>,
+  <span class="s2">&quot;owner&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+<span class="hll">  <span class="s2">&quot;image&quot;</span>: <span class="s2">&quot;taccuser/word-count:1.0&quot;</span>,
+</span>  <span class="s2">&quot;createTime&quot;</span>: <span class="s2">&quot;2020-05-15 18:00:33.685417&quot;</span>,
+  <span class="s2">&quot;lastUpdateTime&quot;</span>: <span class="s2">&quot;2020-05-15 18:00:33.685417&quot;</span>,
+  <span class="s2">&quot;defaultEnvironment&quot;</span>: <span class="o">{</span>
+<span class="hll">    <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span>
+</span>  <span class="o">}</span>,
+  <span class="s2">&quot;gid&quot;</span>: <span class="m">851953</span>,
+  <span class="s2">&quot;hints&quot;</span>: <span class="o">[]</span>,
+  <span class="s2">&quot;link&quot;</span>: <span class="s2">&quot;&quot;</span>,
+  <span class="s2">&quot;mounts&quot;</span>: <span class="o">[]</span>,
+  <span class="s2">&quot;privileged&quot;</span>: false,
+  <span class="s2">&quot;queue&quot;</span>: <span class="s2">&quot;default&quot;</span>,
+  <span class="s2">&quot;stateless&quot;</span>: true,
+<span class="hll">  <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;READY&quot;</span>,
+</span>  <span class="s2">&quot;statusMessage&quot;</span>: <span class="s2">&quot; &quot;</span>,
+  <span class="s2">&quot;token&quot;</span>: true,
+  <span class="s2">&quot;uid&quot;</span>: <span class="m">851953</span>,
+  <span class="s2">&quot;useContainerUid&quot;</span>: false,
+  <span class="s2">&quot;webhook&quot;</span>: <span class="s2">&quot;&quot;</span>,
+  <span class="s2">&quot;_links&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;executions&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/KKP0jKRGJ5l5K/executions&quot;</span>,
+    <span class="s2">&quot;owner&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/profiles/v2/taccuser&quot;</span>,
+    <span class="s2">&quot;self&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/KKP0jKRGJ5l5K&quot;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-a-test-execution">
+<h2>Run a Test Execution<a class="headerlink" href="#run-a-test-execution" title="Permalink to this headline">¶</a></h2>
+<p>Finally, pass a message to the actor to run a test execution. The number of
+words in the message should be returned in the actor execution logs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Send a message to the word-count actor</span>
+$ tapis actors submit -m <span class="s2">&quot;This is a test message with 8 words&quot;</span> KKP0jKRGJ5l5K
++-------------+-------------------------------------+
+<span class="p">|</span> Field       <span class="p">|</span> Value                               <span class="p">|</span>
++-------------+-------------------------------------+
+<span class="p">|</span> executionId <span class="p">|</span> K1p3AZZpXjwZr                       <span class="p">|</span>
+<span class="p">|</span> msg         <span class="p">|</span> This is a <span class="nb">test</span> message with <span class="m">8</span> words <span class="p">|</span>
++-------------+-------------------------------------+
+
+<span class="c1"># List executions of the word-count actor</span>
+$ tapis actors execs list KKP0jKRGJ5l5K
++---------------+----------+
+<span class="p">|</span> executionId   <span class="p">|</span> status   <span class="p">|</span>
++---------------+----------+
+<span class="p">|</span> K1p3AZZpXjwZr <span class="p">|</span> COMPLETE <span class="p">|</span>
++---------------+----------+
+
+<span class="c1"># Get the logs from the completed actor execution</span>
+$ tapis actors execs logs KKP0jKRGJ5l5K K1p3AZZpXjwZr
+Logs <span class="k">for</span> execution K1p3AZZpXjwZr
+ The number of words is: <span class="m">8</span>
+</pre></div>
+</div>
+<p>The actor can also be run synchronously using <code class="docutils literal notranslate"><span class="pre">tapis</span> <span class="pre">actors</span> <span class="pre">run</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors run -m <span class="s2">&quot;This is an example of running the actor synchronously&quot;</span> KKP0jKRGJ5l5K
+The number of words is: <span class="m">9</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>Remember to put your actor under version control. Use a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file to
+avoid accidentally committing anything that contains API keys or passwords.</p>
+<p>Please refer to the
+<a class="reference external" href="https://tacc-cloud.readthedocs.io/projects/abaco/en/latest/index.html">Abaco Documentation</a>
+for more information on creating and working with actors.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tapis-cli-actors</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/install_the_cli.html">Install the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/interact_with_actors.html">Interact With Actors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Shweta Gopaulakrishnan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/actors/create_a_custom_actor.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

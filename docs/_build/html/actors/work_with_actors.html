@@ -1,0 +1,514 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Work with Actors &#8212; tapis-cli-actors  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Create a Custom Actor" href="create.html" />
+    <link rel="prev" title="Interact With Actors" href="../getting-started/interact_with_actors.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="work-with-actors">
+<h1>Work with Actors<a class="headerlink" href="#work-with-actors" title="Permalink to this headline">¶</a></h1>
+<p>In Tapis, <strong>actors</strong> are container-based functions-as-a-service that follow the
+actor model of concurrent computation. An actor responds to messages it receives
+by changing its state, performing an action, sending out response messages, or
+all of the above.</p>
+<p>The function an actor performs is exposed as the default command in a container.
+It is typically quick and requires little processing power - i.e. an app may be
+configured to
+<a class="reference external" href="../advanced-api/create_a_custom_app.html">run FastQC</a>,
+and an actor may trigger a job using that app.</p>
+<p>The guide below is a brief introduction to interacting with actors on the Tapis
+platform. For a full reference guide to actors, see the
+<a class="reference external" href="https://tacc-cloud.readthedocs.io/projects/abaco/en/latest/index.html">Abaco Documentation</a>.</p>
+<div class="section" id="create-a-new-actor">
+<h2>Create a New Actor<a class="headerlink" href="#create-a-new-actor" title="Permalink to this headline">¶</a></h2>
+<p>The function of an actor is exposed as the default command in a Docker
+container. Here, we will create an actor from an existing Docker container image
+called <strong>jturcino/abaco-trial:latest</strong> available on
+‘Docker Hub &lt;<a class="reference external" href="https://hub.docker.com/r/jturcino/abaco-trial/">https://hub.docker.com/r/jturcino/abaco-trial/</a>&gt;’__.
+The default command for this container simply prints some information about the
+current environment to STDOUT, which will be captured in the actor logs.</p>
+<p>Create the actor as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors create --repo jturcino/abaco-trial:latest <span class="se">\</span>
+                      -n example-actor <span class="se">\</span>
+                      -d <span class="s2">&quot;Test actor that prints environment info&quot;</span> <span class="se">\</span>
+                      -e <span class="nv">foo</span><span class="o">=</span>bar <span class="se">\</span>
+                      -e <span class="nv">bar</span><span class="o">=</span>baz
++----------------+-----------------------------+
+<span class="p">|</span> Field          <span class="p">|</span> Value                       <span class="p">|</span>
++----------------+-----------------------------+
+<span class="p">|</span> id             <span class="p">|</span> boEg3mEvrKO5w               <span class="p">|</span>
+<span class="p">|</span> name           <span class="p">|</span> example-actor               <span class="p">|</span>
+<span class="p">|</span> owner          <span class="p">|</span> taccuser                    <span class="p">|</span>
+<span class="p">|</span> image          <span class="p">|</span> jturcino/abaco-trial:latest <span class="p">|</span>
+<span class="p">|</span> lastUpdateTime <span class="p">|</span> <span class="m">2020</span>-05-15 <span class="m">02</span>:39:37.230860  <span class="p">|</span>
+<span class="p">|</span> status         <span class="p">|</span> SUBMITTED                   <span class="p">|</span>
++----------------+-----------------------------+
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--repo</span></code> flag points to the Docker Hub repo on which this actor is based,
+the <code class="docutils literal notranslate"><span class="pre">-n</span></code> flag and <code class="docutils literal notranslate"><span class="pre">-d</span></code> flag attach a human-readable name and description to
+the actor, and the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flags demonstrate how to set (optional) environment
+variables for the actor.</p>
+<p>The resulting actor is assigned an id: <code class="docutils literal notranslate"><span class="pre">boEg3mEvrKO5w</span></code>. The actor id can be
+queried by:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors show -v boEg3mEvrKO5w
+<span class="o">{</span>
+  <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;example-actor&quot;</span>,
+  <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Test actor that prints environment info&quot;</span>,
+  <span class="s2">&quot;owner&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;image&quot;</span>: <span class="s2">&quot;jturcino/abaco-trial:latest&quot;</span>,
+  <span class="s2">&quot;createTime&quot;</span>: <span class="s2">&quot;2020-05-15 02:39:37.230860&quot;</span>,
+  <span class="s2">&quot;lastUpdateTime&quot;</span>: <span class="s2">&quot;2020-05-15 02:39:37.230860&quot;</span>,
+  <span class="s2">&quot;defaultEnvironment&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;bar&quot;</span>: <span class="s2">&quot;baz&quot;</span>,
+    <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span>
+  <span class="o">}</span>,
+  <span class="s2">&quot;gid&quot;</span>: <span class="m">851953</span>,
+  <span class="s2">&quot;hints&quot;</span>: <span class="o">[]</span>,
+  <span class="s2">&quot;link&quot;</span>: <span class="s2">&quot;&quot;</span>,
+  <span class="s2">&quot;mounts&quot;</span>: <span class="o">[]</span>,
+  <span class="s2">&quot;privileged&quot;</span>: false,
+  <span class="s2">&quot;queue&quot;</span>: <span class="s2">&quot;default&quot;</span>,
+  <span class="s2">&quot;stateless&quot;</span>: true,
+  <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;READY&quot;</span>,
+  <span class="s2">&quot;statusMessage&quot;</span>: <span class="s2">&quot; &quot;</span>,
+  <span class="s2">&quot;token&quot;</span>: true,
+  <span class="s2">&quot;uid&quot;</span>: <span class="m">851953</span>,
+  <span class="s2">&quot;useContainerUid&quot;</span>: false,
+  <span class="s2">&quot;webhook&quot;</span>: <span class="s2">&quot;&quot;</span>,
+  <span class="s2">&quot;_links&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;executions&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/boEg3mEvrKO5w/executions&quot;</span>,
+    <span class="s2">&quot;owner&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/profiles/v2/taccuser&quot;</span>,
+    <span class="s2">&quot;self&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/boEg3mEvrKO5w&quot;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Above, you can see the plain text name, description, and default environment
+variables that were passed on the command line. In addition, you can see the
+“status” of the actor is “READY”, meaning it is ready to receive and act on
+messages. Finally, you can list all actors visible to you with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors list
++---------------+---------------+----------+-----------------------------+----------------------------+--------+
+<span class="p">|</span> id            <span class="p">|</span> name          <span class="p">|</span> owner    <span class="p">|</span> image                       <span class="p">|</span> lastUpdateTime             <span class="p">|</span> status <span class="p">|</span>
++---------------+---------------+----------+-----------------------------+----------------------------+--------+
+<span class="p">|</span> boEg3mEvrKO5w <span class="p">|</span> example-actor <span class="p">|</span> taccuser <span class="p">|</span> jturcino/abaco-trial:latest <span class="p">|</span> <span class="m">2020</span>-05-15 <span class="m">02</span>:39:37.230860 <span class="p">|</span> READY  <span class="p">|</span>
++---------------+---------------+----------+-----------------------------+----------------------------+--------+
+</pre></div>
+</div>
+</div>
+<div class="section" id="probe-the-underlying-container">
+<h2>Probe the Underlying Container<a class="headerlink" href="#probe-the-underlying-container" title="Permalink to this headline">¶</a></h2>
+<p>An actor now exists and is waiting for a message to respond to. But, how will
+the actor respond when sent a message? We can probe the underlying container to
+figure out what this specific actor will do. First pull the container locally:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker pull jturcino/abaco-trial:latest
+latest: Pulling from jturcino/abaco-trial
+...
+Digest: sha256:976a83992e1f36b6a1afa0ba71c59ab3d5ff17e66a2f6b1ff1c8a370003087b4
+Status: Downloaded newer image <span class="k">for</span> jturcino/abaco-trial:latest
+docker.io/jturcino/abaco-trial:latest
+</pre></div>
+</div>
+<p>Then find the default command for the container:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker inspect jturcino/abaco-trial:latest <span class="p">|</span> jq <span class="s2">&quot;.[].ContainerConfig.Cmd&quot;</span>
+<span class="o">[</span>
+  <span class="s2">&quot;/bin/sh&quot;</span>,
+  <span class="s2">&quot;-c&quot;</span>,
+  <span class="s2">&quot;#(nop) &quot;</span>,
+  <span class="s2">&quot;CMD [\&quot;python\&quot; \&quot;/script.py\&quot;]&quot;</span>
+<span class="o">]</span>
+</pre></div>
+</div>
+<p>It runs <code class="docutils literal notranslate"><span class="pre">script.py</span></code> at the root level. Print out the contents of <code class="docutils literal notranslate"><span class="pre">script.py</span></code>
+to inspect:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker run --rm jturcino/abaco-trial:latest cat /script.py
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="mi">1</span> <span class="c1">#!/usr/bin/env python</span>
+ <span class="mi">2</span>
+ <span class="mi">3</span> <span class="kn">import</span> <span class="nn">os</span>
+ <span class="mi">4</span> <span class="kn">import</span> <span class="nn">sys</span>
+ <span class="mi">5</span> <span class="kn">import</span> <span class="nn">json</span>
+ <span class="mi">6</span> <span class="kn">from</span> <span class="nn">agavepy.actors</span> <span class="kn">import</span> <span class="n">get_context</span>
+ <span class="mi">7</span>
+ <span class="mi">8</span> <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+ <span class="mi">9</span>
+<span class="hll"><span class="mi">10</span>     <span class="n">context</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">()</span>
+</span><span class="mi">11</span>     <span class="nb">print</span> <span class="s1">&#39;FULL CONTEXT:&#39;</span>
+<span class="mi">12</span>     <span class="nb">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="mi">13</span>
+<span class="mi">14</span>     <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">MESSAGE:&#39;</span>
+<span class="mi">15</span>     <span class="n">message</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">message_dict</span>
+<span class="mi">16</span>     <span class="nb">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="mi">17</span>
+<span class="mi">18</span>     <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">FULL ENVIRONMENT:&#39;</span>
+<span class="mi">19</span>     <span class="nb">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="mi">20</span>
+<span class="mi">21</span>     <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ROOT FILES:&#39;</span>
+<span class="mi">22</span>     <span class="nb">print</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This container, when run, will first get the message that was passed to it (from
+the <code class="docutils literal notranslate"><span class="pre">get_context()</span></code> function, line 10). Then it will print various parts of
+the message and the environment.</p>
+</div>
+<div class="section" id="submit-a-message-to-the-actor">
+<h2>Submit a Message to the Actor<a class="headerlink" href="#submit-a-message-to-the-actor" title="Permalink to this headline">¶</a></h2>
+<p>Next, let’s craft a simple message to send to the reactor. Messages can be plain
+text or in JSON format. When using the python actor libraries as in the example
+above, JSON-formatted messages are made available as python dictionaries.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write a message</span>
+$ <span class="nb">export</span> <span class="nv">MESSAGE</span><span class="o">=</span><span class="s1">&#39;{&quot;key1&quot;:&quot;value1&quot;, &quot;key2&quot;:&quot;value2&quot;}&#39;</span>
+$ <span class="nb">echo</span> <span class="nv">$MESSAGE</span>
+<span class="o">{</span><span class="s2">&quot;key1&quot;</span>:<span class="s2">&quot;value1&quot;</span>, <span class="s2">&quot;key2&quot;</span>:<span class="s2">&quot;value2&quot;</span><span class="o">}</span>
+
+$ Submit the message to the actor
+$ tapis actors submit -m <span class="s2">&quot;</span><span class="nv">$MESSAGE</span><span class="s2">&quot;</span> boEg3mEvrKO5w
++-------------+------------------------------------+
+<span class="p">|</span> Field       <span class="p">|</span> Value                              <span class="p">|</span>
++-------------+------------------------------------+
+<span class="p">|</span> executionId <span class="p">|</span> ayB45Oe8GJvAA                      <span class="p">|</span>
+<span class="p">|</span> msg         <span class="p">|</span> <span class="o">{</span><span class="s2">&quot;key1&quot;</span>:<span class="s2">&quot;value1&quot;</span>, <span class="s2">&quot;key2&quot;</span>:<span class="s2">&quot;value2&quot;</span><span class="o">}</span> <span class="p">|</span>
++-------------+------------------------------------+
+</pre></div>
+</div>
+<p>The id of the actor (<code class="docutils literal notranslate"><span class="pre">boEg3mEvrKO5w</span></code>) was used on the command line to specify
+which actor should receive the message. In response, an “execution id”
+(<code class="docutils literal notranslate"><span class="pre">ayB45Oe8GJvAA</span></code>) is returned. An execution is a specific instance of an actor.
+List all the executions for a given actor as:</p>
+<p>The above execution has already completed. Show detailed information for the
+execution with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors execs show -v boEg3mEvrKO5w ayB45Oe8GJvAA
+<span class="o">{</span>
+  <span class="s2">&quot;actorId&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;apiServer&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu&quot;</span>,
+  <span class="s2">&quot;cpu&quot;</span>: <span class="m">0</span>,
+  <span class="s2">&quot;exitCode&quot;</span>: <span class="m">0</span>,
+  <span class="s2">&quot;finalState&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;Dead&quot;</span>: false,
+    <span class="s2">&quot;Error&quot;</span>: <span class="s2">&quot;&quot;</span>,
+    <span class="s2">&quot;ExitCode&quot;</span>: <span class="m">0</span>,
+    <span class="s2">&quot;FinishedAt&quot;</span>: <span class="s2">&quot;2020-05-15T02:52:27.885125138Z&quot;</span>,
+    <span class="s2">&quot;OOMKilled&quot;</span>: false,
+    <span class="s2">&quot;Paused&quot;</span>: false,
+    <span class="s2">&quot;Pid&quot;</span>: <span class="m">0</span>,
+    <span class="s2">&quot;Restarting&quot;</span>: false,
+    <span class="s2">&quot;Running&quot;</span>: false,
+    <span class="s2">&quot;StartedAt&quot;</span>: <span class="s2">&quot;2020-05-15T02:52:27.778284083Z&quot;</span>,
+    <span class="s2">&quot;Status&quot;</span>: <span class="s2">&quot;exited&quot;</span>
+  <span class="o">}</span>,
+  <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;ayB45Oe8GJvAA&quot;</span>,
+  <span class="s2">&quot;io&quot;</span>: <span class="m">0</span>,
+  <span class="s2">&quot;messageReceivedTime&quot;</span>: <span class="s2">&quot;2020-05-15 02:52:20.737730&quot;</span>,
+  <span class="s2">&quot;runtime&quot;</span>: <span class="m">1</span>,
+  <span class="s2">&quot;startTime&quot;</span>: <span class="s2">&quot;2020-05-15 02:52:27.137874&quot;</span>,
+  <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;COMPLETE&quot;</span>,
+  <span class="s2">&quot;workerId&quot;</span>: <span class="s2">&quot;AMgVYDQ8lvlP6&quot;</span>,
+  <span class="s2">&quot;_links&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;logs&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/boEg3mEvrKO5w/executions/ayB45Oe8GJvAA/logs&quot;</span>,
+    <span class="s2">&quot;owner&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/profiles/v2/taccuser&quot;</span>,
+    <span class="s2">&quot;self&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu/actors/v2/boEg3mEvrKO5w/executions/ayB45Oe8GJvAA&quot;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="check-the-logs-for-an-execution">
+<h2>Check the Logs for an Execution<a class="headerlink" href="#check-the-logs-for-an-execution" title="Permalink to this headline">¶</a></h2>
+<p>An execution’s logs will contain whatever was printed to STDOUT / STDERR by the
+actor. In our demo actor, we just expect the actor to print various parts of the
+environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors execs logs boEg3mEvrKO5w ayB45Oe8GJvAA
+Logs <span class="k">for</span> execution ayB45Oe8GJvAA
+ FULL CONTEXT:
+<span class="o">{</span>
+  <span class="s2">&quot;username&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;_abaco_jwt_header_name&quot;</span>: <span class="s2">&quot;X-Jwt-Assertion-Tacc-Prod&quot;</span>,
+  <span class="s2">&quot;_abaco_worker_id&quot;</span>: <span class="s2">&quot;AMgVYDQ8lvlP6&quot;</span>,
+  <span class="s2">&quot;raw_message&quot;</span>: <span class="s2">&quot;{\&quot;key1\&quot;:\&quot;value1\&quot;, \&quot;key2\&quot;:\&quot;value2\&quot;}&quot;</span>,
+  <span class="s2">&quot;actor_dbid&quot;</span>: <span class="s2">&quot;TACC-PROD_boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;PATH&quot;</span>: <span class="s2">&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>,
+  <span class="s2">&quot;_abaco_access_token&quot;</span>: <span class="s2">&quot;7a2f635733c430b29819c267590f042&quot;</span>,
+  <span class="s2">&quot;_abaco_container_repo&quot;</span>: <span class="s2">&quot;jturcino/abaco-trial:latest&quot;</span>,
+  <span class="s2">&quot;content_type&quot;</span>: null,
+  <span class="s2">&quot;HOME&quot;</span>: <span class="s2">&quot;/&quot;</span>,
+  <span class="s2">&quot;MSG&quot;</span>: <span class="s2">&quot;{\&quot;key1\&quot;:\&quot;value1\&quot;, \&quot;key2\&quot;:\&quot;value2\&quot;}&quot;</span>,
+  <span class="s2">&quot;bar&quot;</span>: <span class="s2">&quot;baz&quot;</span>,
+  <span class="s2">&quot;_abaco_api_server&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_name&quot;</span>: <span class="s2">&quot;example-actor&quot;</span>,
+  <span class="s2">&quot;_abaco_Content_Type&quot;</span>: <span class="s2">&quot;str&quot;</span>,
+  <span class="s2">&quot;execution_id&quot;</span>: <span class="s2">&quot;ayB45Oe8GJvAA&quot;</span>,
+  <span class="s2">&quot;_abaco_synchronous&quot;</span>: <span class="s2">&quot;False&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_state&quot;</span>: <span class="s2">&quot;{}&quot;</span>,
+  <span class="s2">&quot;message_dict&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;key2&quot;</span>: <span class="s2">&quot;value2&quot;</span>,
+    <span class="s2">&quot;key1&quot;</span>: <span class="s2">&quot;value1&quot;</span>
+  <span class="o">}</span>,
+  <span class="s2">&quot;_abaco_actor_dbid&quot;</span>: <span class="s2">&quot;TACC-PROD_boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;HOSTNAME&quot;</span>: <span class="s2">&quot;9e70a9f51927&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;_abaco_execution_id&quot;</span>: <span class="s2">&quot;ayB45Oe8GJvAA&quot;</span>,
+  <span class="s2">&quot;environment&quot;</span>: <span class="s2">&quot;_abaco_synchronous&quot;</span>,
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;{}&quot;</span>,
+  <span class="s2">&quot;_abaco_username&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;actor_id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span>
+<span class="o">}</span>
+
+MESSAGE:
+<span class="o">{</span>
+  <span class="s2">&quot;key2&quot;</span>: <span class="s2">&quot;value2&quot;</span>,
+  <span class="s2">&quot;key1&quot;</span>: <span class="s2">&quot;value1&quot;</span>
+<span class="o">}</span>
+
+FULL ENVIRONMENT:
+<span class="o">{</span>
+  <span class="s2">&quot;_abaco_synchronous&quot;</span>: <span class="s2">&quot;False&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_state&quot;</span>: <span class="s2">&quot;{}&quot;</span>,
+  <span class="s2">&quot;bar&quot;</span>: <span class="s2">&quot;baz&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_dbid&quot;</span>: <span class="s2">&quot;TACC-PROD_boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;HOSTNAME&quot;</span>: <span class="s2">&quot;9e70a9f51927&quot;</span>,
+  <span class="s2">&quot;_abaco_execution_id&quot;</span>: <span class="s2">&quot;ayB45Oe8GJvAA&quot;</span>,
+  <span class="s2">&quot;_abaco_Content_Type&quot;</span>: <span class="s2">&quot;str&quot;</span>,
+  <span class="s2">&quot;_abaco_container_repo&quot;</span>: <span class="s2">&quot;jturcino/abaco-trial:latest&quot;</span>,
+  <span class="s2">&quot;environment&quot;</span>: <span class="s2">&quot;_abaco_synchronous&quot;</span>,
+  <span class="s2">&quot;_abaco_jwt_header_name&quot;</span>: <span class="s2">&quot;X-Jwt-Assertion-Tacc-Prod&quot;</span>,
+  <span class="s2">&quot;_abaco_username&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;_abaco_worker_id&quot;</span>: <span class="s2">&quot;AMgVYDQ8lvlP6&quot;</span>,
+  <span class="s2">&quot;_abaco_access_token&quot;</span>: <span class="s2">&quot;7a2f635733c430b29819c267590f042&quot;</span>,
+  <span class="s2">&quot;MSG&quot;</span>: <span class="s2">&quot;{\&quot;key1\&quot;:\&quot;value1\&quot;, \&quot;key2\&quot;:\&quot;value2\&quot;}&quot;</span>,
+  <span class="s2">&quot;HOME&quot;</span>: <span class="s2">&quot;/&quot;</span>,
+  <span class="s2">&quot;_abaco_api_server&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_name&quot;</span>: <span class="s2">&quot;example-actor&quot;</span>,
+  <span class="s2">&quot;foo&quot;</span>: <span class="s2">&quot;bar&quot;</span>,
+  <span class="s2">&quot;PATH&quot;</span>: <span class="s2">&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>
+<span class="o">}</span>
+
+ROOT FILES:
+bin boot dev etc home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var _abaco_results.sock .dockerenv requirements.txt agavepy script.py
+</pre></div>
+</div>
+<p>Sure enough, the information in the execution logs match what we expected
+<code class="docutils literal notranslate"><span class="pre">script.py</span></code> to print. The message dictionary was pulled in by the
+<code class="docutils literal notranslate"><span class="pre">`get_context()</span></code> function. It was not done in this script, but in a normal
+scenario, the actor would then act on the contents of that message to, e.g.,
+kick off a job, perform some data management, send messages to other actors, or
+more.</p>
+</div>
+<div class="section" id="update-an-actor">
+<h2>Update an Actor<a class="headerlink" href="#update-an-actor" title="Permalink to this headline">¶</a></h2>
+<p>Updating an actor would be useful to modify its environment, or to deploy a new
+tagged version of the Docker container containing, perhaps, an updated actor
+python script. Update an existing actor as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors update --repo jturcino/abaco-trial:latest <span class="se">\</span>
+                      -e <span class="nv">new_foo</span><span class="o">=</span>new_bar <span class="se">\</span>
+                      boEg3mEvrKO5w
++----------------+-----------------------------+
+<span class="p">|</span> Field          <span class="p">|</span> Value                       <span class="p">|</span>
++----------------+-----------------------------+
+<span class="p">|</span> id             <span class="p">|</span> boEg3mEvrKO5w               <span class="p">|</span>
+<span class="p">|</span> name           <span class="p">|</span> example-actor               <span class="p">|</span>
+<span class="p">|</span> owner          <span class="p">|</span> taccuser                    <span class="p">|</span>
+<span class="p">|</span> image          <span class="p">|</span> jturcino/abaco-trial:latest <span class="p">|</span>
+<span class="p">|</span> lastUpdateTime <span class="p">|</span> <span class="m">2020</span>-05-15 <span class="m">03</span>:03:03.724195  <span class="p">|</span>
+<span class="p">|</span> status         <span class="p">|</span> READY                       <span class="p">|</span>
++----------------+-----------------------------+
+</pre></div>
+</div>
+<p>In this example, a new environment variable was provided and the previously-passed
+environment variables were omitted. The Docker repo stayed the same, but must
+still be passed on the command line.</p>
+</div>
+<div class="section" id="run-synchronously">
+<h2>Run Synchronously<a class="headerlink" href="#run-synchronously" title="Permalink to this headline">¶</a></h2>
+<p>The previous message submission (with <code class="docutils literal notranslate"><span class="pre">tapis</span> <span class="pre">actors</span> <span class="pre">submit</span></code>) was an
+<em>asynchronous</em> run, meaning the command prompt detached from the process after
+it was submitted to the actor. In that case, it was up to us to check the execution
+to see if it had completed and manually print the logs.</p>
+<p>There is also a mode to run actors <em>synchronously</em> using <code class="docutils literal notranslate"><span class="pre">tapis</span> <span class="pre">actors</span> <span class="pre">run</span></code>,
+meaning the command line stays attached to the process awaiting a response after
+sending a message to the actor. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors run -m <span class="s2">&quot;</span><span class="nv">$MESSAGE</span><span class="s2">&quot;</span> boEg3mEvrKO5w
+FULL CONTEXT:
+<span class="o">{</span>
+  <span class="s2">&quot;username&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;HOSTNAME&quot;</span>: <span class="s2">&quot;33d4dd334ef9&quot;</span>,
+  <span class="s2">&quot;_abaco_worker_id&quot;</span>: <span class="s2">&quot;X5xGkZ0lol0D3&quot;</span>,
+  <span class="s2">&quot;raw_message&quot;</span>: <span class="s2">&quot;{\&quot;key1\&quot;:\&quot;value1\&quot;, \&quot;key2\&quot;:\&quot;value2\&quot;}&quot;</span>,
+  <span class="s2">&quot;actor_dbid&quot;</span>: <span class="s2">&quot;TACC-PROD_boEg3mEvrKO5w&quot;</span>,
+<span class="hll">  <span class="s2">&quot;new_foo&quot;</span>: <span class="s2">&quot;new_bar&quot;</span>,
+</span>  <span class="s2">&quot;_abaco_container_repo&quot;</span>: <span class="s2">&quot;jturcino/abaco-trial:latest&quot;</span>,
+  <span class="s2">&quot;content_type&quot;</span>: null,
+  <span class="s2">&quot;PATH&quot;</span>: <span class="s2">&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>,
+  <span class="s2">&quot;MSG&quot;</span>: <span class="s2">&quot;{\&quot;key1\&quot;:\&quot;value1\&quot;, \&quot;key2\&quot;:\&quot;value2\&quot;}&quot;</span>,
+  <span class="s2">&quot;HOME&quot;</span>: <span class="s2">&quot;/&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_state&quot;</span>: <span class="s2">&quot;{}&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_name&quot;</span>: <span class="s2">&quot;example-actor&quot;</span>,
+  <span class="s2">&quot;_abaco_Content_Type&quot;</span>: <span class="s2">&quot;str&quot;</span>,
+  <span class="s2">&quot;execution_id&quot;</span>: <span class="s2">&quot;jP3RExQW108wM&quot;</span>,
+  <span class="s2">&quot;_abaco_synchronous&quot;</span>: <span class="s2">&quot;True&quot;</span>,
+  <span class="s2">&quot;_abaco_access_token&quot;</span>: <span class="s2">&quot;de6d11bdbb5a16bdd85beec692b1b283&quot;</span>,
+  <span class="s2">&quot;message_dict&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;key2&quot;</span>: <span class="s2">&quot;value2&quot;</span>,
+    <span class="s2">&quot;key1&quot;</span>: <span class="s2">&quot;value1&quot;</span>
+  <span class="o">}</span>,
+  <span class="s2">&quot;_abaco_api_server&quot;</span>: <span class="s2">&quot;https://api.tacc.utexas.edu&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_dbid&quot;</span>: <span class="s2">&quot;TACC-PROD_boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;_abaco_jwt_header_name&quot;</span>: <span class="s2">&quot;X-Jwt-Assertion-Tacc-Prod&quot;</span>,
+  <span class="s2">&quot;_abaco_actor_id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>,
+  <span class="s2">&quot;_abaco_execution_id&quot;</span>: <span class="s2">&quot;jP3RExQW108wM&quot;</span>,
+  <span class="s2">&quot;state&quot;</span>: <span class="s2">&quot;{}&quot;</span>,
+  <span class="s2">&quot;_abaco_username&quot;</span>: <span class="s2">&quot;taccuser&quot;</span>,
+  <span class="s2">&quot;actor_id&quot;</span>: <span class="s2">&quot;boEg3mEvrKO5w&quot;</span>
+<span class="o">}</span>
+...
+</pre></div>
+</div>
+<p>The output above is truncated because it is mostly the same response as our
+first execution of the actor. This time, however, we did not need to query the
+logs for this execution for them to print to screen - that was done
+automatically. In addition, the new environment variable settings can be seen
+in the context (see highlighted line).</p>
+</div>
+<div class="section" id="delete-an-actor">
+<h2>Delete an Actor<a class="headerlink" href="#delete-an-actor" title="Permalink to this headline">¶</a></h2>
+<p>Similar to other resources in Tapis, actors can be deleted with the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors delete boEg3mEvrKO5w
++----------+-------------------+
+<span class="p">|</span> Field    <span class="p">|</span> Value             <span class="p">|</span>
++----------+-------------------+
+<span class="p">|</span> deleted  <span class="p">|</span> <span class="o">[</span><span class="s1">&#39;boEg3mEvrKO5w&#39;</span><span class="o">]</span> <span class="p">|</span>
+<span class="p">|</span> messages <span class="p">|</span> <span class="o">[]</span>                <span class="p">|</span>
++----------+-------------------+
+</pre></div>
+</div>
+<p>This will delete the actor and any associated executions.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tapis-cli-actors</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/install_the_cli.html">Install the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/interact_with_actors.html">Interact With Actors</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Actors:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Work with Actors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-new-actor">Create a New Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#probe-the-underlying-container">Probe the Underlying Container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submit-a-message-to-the-actor">Submit a Message to the Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-the-logs-for-an-execution">Check the Logs for an Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update-an-actor">Update an Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-synchronously">Run Synchronously</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#delete-an-actor">Delete an Actor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="create.html">Create a Custom Actor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="list.html">Actor List</a></li>
+<li class="toctree-l1"><a class="reference internal" href="show.html">Actors Show</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run.html">Actors Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="submit.html">Actors Submit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update.html">Actor Update</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delete.html">Actor Delete</a></li>
+<li class="toctree-l1"><a class="reference internal" href="executions.html">Actor Executions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aliases.html">Actor Aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="permissions.html">Actor Permissions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workers.html">Actor Workers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonces.html">Actor Nonces</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../getting-started/interact_with_actors.html" title="previous chapter">Interact With Actors</a></li>
+      <li>Next: <a href="create.html" title="next chapter">Create a Custom Actor</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Shweta Gopaulakrishnan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/actors/work_with_actors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

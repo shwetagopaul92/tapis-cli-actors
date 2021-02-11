@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Install the CLI &#8212; tapis-cli-actors  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Interact With Actors" href="interact_with_actors.html" />
+    <link rel="prev" title="Welcome to tapis-cli-actors’s documentation!" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="install-the-cli">
+<h1>Install the CLI<a class="headerlink" href="#install-the-cli" title="Permalink to this headline">¶</a></h1>
+<p>The Tapis CLI is available as a Python package. We highly recommend using Python 3.7+ as the Python runtime behind the Tapis CLI.
+We support Python 2.7 for legacy applications, but on a best-effort basis as Python 2.7 is a deprecated language.</p>
+<p>Tapis CLI is a human-friendly, scriptable command line interface, implemented in Python, that helps scientists and engineers build and manage scalable computational and data science workflow projects using the Tapis platform.
+It is a replacement for a pure-Bash CLI environment known as agave-cli that we hope brings you new features, better reliability, and dramatically enhanced productivity.</p>
+<p>Tapis CLI provides a unified interface to multiple web service APIs, allowing them to be easily orchestrated and composed into higher-order constructs combining HPC, data management, cloud computing, and other aspects of computing.</p>
+<p>Documentation: &lt;<a class="reference external" href="https://tapis-cli.readthedocs.io/en/latest/">https://tapis-cli.readthedocs.io/en/latest/</a>&gt;</p>
+<div class="section" id="install-with-pip">
+<h2>Install with Pip<a class="headerlink" href="#install-with-pip" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install tapis-cli
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-from-source">
+<h2>Install from Source<a class="headerlink" href="#install-from-source" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/TACC-Cloud/tapis-cli-ng.git
+$ <span class="nb">cd</span> tapis-cli-ng/
+$ pip install --upgrade --user .
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-in-a-container">
+<h2>Run in a Container<a class="headerlink" href="#run-in-a-container" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker run --rm -it -v <span class="si">${</span><span class="nv">PWD</span><span class="si">}</span>:/work -v <span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/.agave:/root/.agave <span class="se">\</span>
+    tacc/tapis-cli-ng:latest /bin/bash
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tapis-cli-actors</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Install the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interact_with_actors.html">Interact With Actors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to tapis-cli-actors’s documentation!</a></li>
+      <li>Next: <a href="interact_with_actors.html" title="next chapter">Interact With Actors</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Shweta Gopaulakrishnan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/getting-started/install_the_cli.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

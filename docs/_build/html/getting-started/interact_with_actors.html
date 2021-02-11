@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Interact With Actors &#8212; tapis-cli-actors  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Overview" href="../actors/work_with_actors.html" />
+    <link rel="prev" title="Install the CLI" href="install_the_cli.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="interact-with-actors">
+<h1>Interact With Actors<a class="headerlink" href="#interact-with-actors" title="Permalink to this headline">¶</a></h1>
+<p>In Tapis, actors are container-based functions-as-a-service that follow the actor model of concurrent computation. An actor responds to messages it receives by changing its state, performing an action, sending out response messages, or all of the above.</p>
+<p>The function an actor performs is exposed as the default command in a container. It is typically quick and requires little processing power - i.e. an app may be configured to run FastQC, and an actor may trigger a job using that app.</p>
+<p>The guide below is a brief introduction to interacting with actors on the Tapis platform.</p>
+<dl class="simple">
+<dt><strong>Prerequisite</strong></dt><dd><ul class="simple">
+<li><p>Install tapis-cli</p></li>
+</ul>
+</dd>
+</dl>
+<p>The following command throws a help text of the available actors commands available.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors -h
+  Command <span class="s2">&quot;actors&quot;</span> matches:
+  actors aliases create
+  actors aliases delete
+  actors aliases list
+  actors aliases show
+  actors create
+  actors delete
+  actors deploy
+  actors execs list
+  actors execs logs
+  actors execs show
+  actors list
+  actors nonces create
+  actors nonces delete
+  actors nonces list
+  actors nonces show
+  actors pems grant
+  actors pems list
+  actors pems revoke
+  actors pems show
+  actors run
+  actors show
+  actors submit
+  actors update
+  actors workers create
+  actors workers delete
+  actors workers list
+  actors workers show
+</pre></div>
+</div>
+<div class="section" id="working-with-an-actor-command">
+<h2>Working with an Actor command<a class="headerlink" href="#working-with-an-actor-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tapis actors list
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tapis-cli-actors</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install_the_cli.html">Install the CLI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Interact With Actors</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Actors:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#create-a-new-actor">Create a New Actor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#probe-the-underlying-container">Probe the Underlying Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#submit-a-message-to-the-actor">Submit a Message to the Actor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#check-the-logs-for-an-execution">Check the Logs for an Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#update-an-actor">Update an Actor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#run-synchronously">Run Synchronously</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/work_with_actors.html#delete-an-actor">Delete an Actor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actors/aliases.html">Actor Aliases</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="install_the_cli.html" title="previous chapter">Install the CLI</a></li>
+      <li>Next: <a href="../actors/work_with_actors.html" title="next chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Shweta Gopaulakrishnan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/getting-started/interact_with_actors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
